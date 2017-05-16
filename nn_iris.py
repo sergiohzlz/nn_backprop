@@ -6,6 +6,13 @@ from numpy import hstack,exp,dot,ones,tanh,mean,abs,array
 import numpy as np
 import sys
 
+def escala( X,eps=0.001 ):
+    """
+    Funcion para escalar el conjunto de datos X
+    """
+    return (X - np.min(X, axis = 0)) / (np.max(X, axis = 0) + eps)
+
+
 def fact(f='sigmoide'):
     if f=='sigmoide':
         return [lambda x: 1./(1+np.exp(-x)), lambda y: y*(1-y)]
@@ -57,8 +64,10 @@ X = datos[:,:-1]
 Y = datos[:,-1].reshape(-1,1)
 marca = int(len(idxs)*0.75)
 idx_tr, idx_ts = idxs[:marca], idxs[marca:]
-X_tr, X_ts = X[idx_tr], X[idx_ts]
-Y_tr, Y_ts = Y[idx_tr], Y[idx_ts]
+X_trn, X_tsn = X[idx_tr], X[idx_ts]
+Y_trn, Y_tsn = Y[idx_tr], Y[idx_ts]
+X_tr, X_ts = escala(X_trn), escala(X_tsn)
+Y_tr, Y_ts = escala(Y_trn), escala(Y_tsn)
 
 tipocapa1="sigmoide"
 tipocapa2="sigmoide"
@@ -87,3 +96,4 @@ if __name__ == '__main__':
     print("Red Entrenada ")
     for x,y in zip(ff(X_ts,pesos_t),Y_ts):
         print("{0} --> {1}".format( x, y ))
+
