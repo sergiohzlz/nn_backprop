@@ -61,7 +61,7 @@ fh, dfh = f1
 fs, dfs = f2
 
 if __name__ == '__main__':
-    intermedias = 5
+    intermedias = 2
     cons_aprendizaje = 0.1
     iteraciones = 20000
     alfa, iters = (cons_aprendizaje, iteraciones)
