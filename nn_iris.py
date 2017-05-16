@@ -96,4 +96,6 @@ if __name__ == '__main__':
     print("Red Entrenada ")
     for x,y in zip(ff(X_ts,pesos_t),Y_ts):
         print("{0} --> {1}".format( x, y ))
+    print("pesos primera capa \n{0}".format(syn_0))
+    print("pesos segunda capa \n{0}".format(syn_1))
 
