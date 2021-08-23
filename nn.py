@@ -16,37 +16,39 @@ def fact(f='sigmoide'):
 
 def creapesos( arq ):
     en,hn,sn = arq
-    syn_0 = 2*np.random.random( (en+1,hn+1) )-1
-    syn_1 = 2*np.random.random( (hn+1,sn) )-1
-    return [syn_0, syn_1]
+    Wh = 2*np.random.random( (en+1,hn+1) )-1
+    Wo = 2*np.random.random( (hn+1,sn) )-1
+    return [Wh, Wo]
 
 def entrena(iters,alfa,pesos,iterr=1000,verbose=False):
-    syn_0, syn_1 = pesos
+    Wh, Wo  = pesos
     for j in range(iters):
+        #agregamos nodo sesgo
         I = hstack( (X,ones((len(X),1))) )
-        H = fh(dot(I,syn_0))
-        S = fs(dot(H,syn_1))
+        #feedforward
+        H = fh(dot(I,Wh))
+        S = fs(dot(H,Wo))
         #error de la capa de salida
         S_err = S - Y
         #delta capa salida
         S_d = S_err*dfs(S)
         #error capa escondida
-        H_err = S_d.dot(syn_1.T)
+        H_err = S_d.dot(Wo.T)
         #delta capa escondida
         H_d = H_err*dfh(H)
         #actualizamos pesos
-        syn_1 -= alfa * (H.T.dot(S_d))
-        syn_0 -= alfa * (I.T.dot(H_d))
+        Wo    -= alfa * (H.T.dot(S_d))
+        Wh    -= alfa * (I.T.dot(H_d))
         if(verbose):
             if((iterr>0) and (j%iterr==0)):
                 print(mean(abs(S_err)))
-    return [syn_0,syn_1]
+    return [Wh,Wo]
 
 def ff(estimulo,pesos):
-    syn_0, syn_1 = pesos
+    Wh, Wo = pesos
     I = hstack( (estimulo,ones((len(estimulo),1))) )
-    H = fh(dot(I,syn_0))
-    S = fs(dot(H,syn_1))
+    H = fh(dot(I,Wh))
+    S = fs(dot(H,Wo))
     return S
 
 
@@ -54,33 +56,34 @@ xor = array( [[0,0,1,0],[0,1,1,1],[1,0,1,1],[1,1,1,0]] )
 X = xor[:,:-1]
 Y = xor[:,-1].reshape(-1,1)
 
-tipocapa1="tanh"
-tipocapa2="tanh"
+tipocapa1="sigmoide"
+tipocapa2="sigmoide"
 f1, f2 = fact(tipocapa1), fact(tipocapa2)
 fh, dfh = f1
 fs, dfs = f2
 
 if __name__ == '__main__':
-    intermedias = 2
-    cons_aprendizaje = 0.1
+    intermedias = 5
+    cons_aprendizaje = 1
     iteraciones = 20000
     alfa, iters = (cons_aprendizaje, iteraciones)
     en, hn, sn = ( X.shape[1], intermedias, Y.shape[1] )
-    syn_0, syn_1 = creapesos( (en,hn,sn) )
+    Ws, Wo = creapesos( (en,hn,sn) )
     print("alfa: {0}".format(alfa))
     print("iteraciones: {0}".format(iters))
     print("arquitectura: {0} {1} {2}".format(en,hn,sn))
     print("funciones de activacion: {0} {1}".format(tipocapa1,tipocapa2))
-    print("pesos primera capa \n{0}".format(syn_0))
-    print("pesos segunda capa \n{0}".format(syn_1))
+    print("pesos primera capa \n{0}".format(Ws))
+    print("pesos segunda capa \n{0}".format(Wo))
     print("Datos \n{0}".format(X))
     print("Previo ")
-    for x,y in zip(ff(X,[syn_0,syn_1]),Y):
-        print("{0} : {1}".format(x,y))
-    pesos_t = entrena(iters,alfa,[syn_0,syn_1])
+    for x,y in zip(ff(X,[Ws,Wo]),Y):
+        err = abs(y-x)
+        print("{0} : {1} : {2}".format(x,y,err))
+    pesos_t = entrena(iters,alfa,[Ws,Wo])
     print("Entrenada")
     for x,y in zip(ff(X,pesos_t),Y):
-        print("{0} : {1}".format(x,y))
-    print("pesos primera capa \n{0}".format(syn_0))
-    print("pesos segunda capa \n{0}".format(syn_1))
-
+        err = abs(y-x)
+        print("{0} : {1} : {2}".format(x,y,err))
+    print("pesos primera capa \n{0}".format(pesos_t[0]))
+    print("pesos segunda capa \n{0}".format(pesos_t[1]))
